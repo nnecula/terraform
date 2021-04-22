@@ -1,5 +1,4 @@
-#Defining provider
-
+# Defining provider
 provider "azurerm" {
   features {}
 }
@@ -7,21 +6,18 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "2.52.0"
+      version = "2.56.0"
     }
   }
-
 }
 
-#Create Resource Group
-
+# Create Resource Group
 resource "azurerm_resource_group" "rg" {
-  name     = "PracticeRG"
-  location = "northeurope"
+  name     = "LinuxVM"
+  location = "westeurope"
 }
 
-#Create Virtual Network
-
+# Create Virtual Network
 resource "azurerm_virtual_network" "vnet" {
   name                = "nnecula_vnet"
   address_space       = ["10.0.0.0/16"]
@@ -31,11 +27,9 @@ resource "azurerm_virtual_network" "vnet" {
   tags = {
     "ENV" = "Azure DevOps"
   }
-
-
 }
-#Create Subnet
 
+# Create Subnet
 resource "azurerm_subnet" "subnet" {
   name                 = "nnecula_test_subnet"
   resource_group_name  = azurerm_resource_group.rg.name
@@ -51,7 +45,7 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Dynamic"
 
   tags = {
-    environment = "production"
+    ENV = "Azure DevOps"
   }
 }
 
@@ -80,7 +74,6 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 # Create network interface
-
 resource "azurerm_network_interface" "nic" {
   name                = "nnecula_NIC"
   location            = azurerm_resource_group.rg.location
@@ -117,7 +110,7 @@ resource "azurerm_storage_account" "storage" {
   }
 }
 
-# Create (and display) an SSH key
+# Create/display an SSH key
 resource "tls_private_key" "example_ssh" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -125,14 +118,14 @@ resource "tls_private_key" "example_ssh" {
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "linuxvm" {
-  name                  = "nneculanlinuxvm"
+  name                  = "linuxvm021"
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.nic.id]
   size                  = "Standard_DS1_v2"
 
   os_disk {
-    name                 = "myOsDisk"
+    name                 = "OsDisk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -144,12 +137,12 @@ resource "azurerm_linux_virtual_machine" "linuxvm" {
     version   = "latest"
   }
 
-  computer_name                   = "nneculanlinuxvm"
+  computer_name                   = "mylnxvm"
   admin_username                  = "nnecula"
   disable_password_authentication = true
 
   admin_ssh_key {
-    username   = "azureuser"
+    username   = "nnecula"
     public_key = tls_private_key.example_ssh.public_key_openssh
   }
 
