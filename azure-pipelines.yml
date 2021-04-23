@@ -14,23 +14,6 @@ stages:
     steps:
     
     - task: TerraformInstaller@0
-      displayName: Install TF 0.14.8
+      displayName: Install TF 0.15.0
       inputs:
-        terraformVersion: '0.14.8'
-
-    - task: TerraformTaskV1@0
-      displayName: $ terraform init
-      inputs:
-        provider: 'azurerm'
-        command: 'init'
-    - task: TerraformTaskV1@0
-      displayName: $ terraform plan
-      inputs:
-        provider: 'azurerm'
-        command: 'plan -out tfplan'
- 
-    - task: TerraformTaskV1@0
-      displayName: $ terraform apply tfplan
-      inputs:
-        provider: 'azurerm'
-        command: 'apply'
+        terraformVersion: '0.15.0'
