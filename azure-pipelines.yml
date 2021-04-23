@@ -1,31 +1,36 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
-- task: TerraformInstaller@0
-  inputs:
-    terraformVersion: 'latest'
-- task: TerraformCLI@0
-  inputs:
-    command: 'init'
-    backendType: 'azurerm'
-    backendServiceArm: 'Free Trial (87b2a1a0-a18e-48ca-8c54-a1be6aacc2fd)'
-    allowTelemetryCollection: true
-- task: TerraformCLI@0
-  inputs:
-    command: 'plan'
-    environmentServiceName: 'Free Trial (87b2a1a0-a18e-48ca-8c54-a1be6aacc2fd)'
-    commandOptions: '-out tfplan'
-    allowTelemetryCollection: true
-- task: TerraformCLI@0
-  inputs:
-    command: 'apply'
-    environmentServiceName: 'Free Trial (87b2a1a0-a18e-48ca-8c54-a1be6aacc2fd)'
-    commandOptions: 'tfplan'
-    allowTelemetryCollection: true
+stages:
+- stage: Terraform_init_plan
+
+  pool:
+    vmImage: ubuntu-latest
+
+  jobs:
+ 
+  - job: terraform_init_plan
+
+    steps:
+    
+    - task: TerraformInstaller@0
+      displayName: Install TF 0.14.8
+      inputs:
+        terraformVersion: '0.14.8'
+
+    - task: TerraformTaskV1@0
+      displayName: $ terraform init
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+    - task: TerraformTaskV1@0
+      displayName: $ terraform plan
+      inputs:
+        provider: 'azurerm'
+        command: 'plan -out tfplan'
+ 
+    - task: TerraformTaskV1@0
+      displayName: $ terraform apply tfplan
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
